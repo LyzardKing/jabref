@@ -33,59 +33,60 @@ jobs:
       uses: actions/checkout@v1
       with:
         fetch-depth: 1
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11.0.4
-    - name: Download jpackage
-      # We need to download jpackage from https://jdk.java.net/jpackage/
-      run: |
-        import tarfile
-        import zipfile
-        import sys
-        if sys.version_info[0] >= 3:
-          from urllib.request import urlretrieve
-        else:
-          from urllib import urlretrieve
+    # - name: Set up JDK
+    #   uses: actions/setup-java@v1
+    #   with:
+    #     java-version: 11.0.4
+    # - name: Download jpackage
+    #   # We need to download jpackage from https://jdk.java.net/jpackage/
+    #   run: |
+    #     import tarfile
+    #     import zipfile
+    #     import sys
+    #     if sys.version_info[0] >= 3:
+    #       from urllib.request import urlretrieve
+    #     else:
+    #       from urllib import urlretrieve
 
-        url = "${{ matrix.jpackageDownload }}"
-        tmpfile, headers = urlretrieve(url)
-        if (url.endswith("tar.gz")):
-          tar = tarfile.open(tmpfile)
-          tar.extractall()
-          tar.close()
-        elif (url.endswith("zip")):
-          zip = zipfile.ZipFile(tmpfile)
-          zip.extractall()
-          zip.close()
-      shell: python
-    - name: Build runtime image
-      run: ./gradlew -Pdev=true jlinkZip
-    - name: Build installer
-      run: |
-        export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-        ./gradlew -Pdev=true jpackage
-      shell: bash
-    - name: Add installer as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/distribution
-    - name: Package application image
-      run: ${{ matrix.archivePortable }}
-      shell: bash
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
+    #     url = "${{ matrix.jpackageDownload }}"
+    #     tmpfile, headers = urlretrieve(url)
+    #     if (url.endswith("tar.gz")):
+    #       tar = tarfile.open(tmpfile)
+    #       tar.extractall()
+    #       tar.close()
+    #     elif (url.endswith("zip")):
+    #       zip = zipfile.ZipFile(tmpfile)
+    #       zip.extractall()
+    #       zip.close()
+    #   shell: python
+    # - name: Build runtime image
+    #   run: ./gradlew -Pdev=true jlinkZip
+    # - name: Build installer
+    #   run: |
+    #     export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
+    #     ./gradlew -Pdev=true jpackage
+    #   shell: bash
+    # - name: Add installer as artifact
+    #   uses: actions/upload-artifact@master
+    #   with:
+    #     name: JabRef-${{ matrix.displayName }}
+    #     path: build/distribution
+    # - name: Package application image
+    #   run: ${{ matrix.archivePortable }}
+    #   shell: bash
+    # - name: Extract branch name
+    #   shell: bash
+    #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+    #   id: extract_branch
     - name: Build and publish snap
       if: matrix.os == 'ubuntu-latest'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
-          snap install snapcraft --classic
-          snap install multipass --beta --classic
-          snapcraftmv jabref*.snap build/distrubutions/
+          sudo snap install snapcraft --classic
+          sudo snap install multipass --beta --classic
+          snapcraft
+          mv jabref*.snap build/distrubutions/
           # docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/"
           # cd build/distribution/ && mdkir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=beta *.snap
       shell: bash
