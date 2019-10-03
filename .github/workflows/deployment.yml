@@ -85,7 +85,8 @@ jobs:
       run: |
           sudo snap install snapcraft --classic
           sudo snap install lxd
-          lxd init --auto
+          sudo lxd init --auto
+          sudo snap start lxd
           snapcraft --use-lxd
           mv jabref*.snap build/distrubutions/
           # docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/"
