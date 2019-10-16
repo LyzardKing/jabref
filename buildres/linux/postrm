@@ -19,8 +19,8 @@ set -e
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
-    if grep --quiet '"path": "/opt' /usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json; then
-        rm -D -m0755 /opt/jabref/lib/org.jabref.jabref.json $INSTALL_PATH
+    if grep --quiet '"path": "/opt' $INSTALL_PATH/org.jabref.jabref.json; then
+        rm $INSTALL_PATH/org.jabref.jabref.json
     fi
     ;;
 

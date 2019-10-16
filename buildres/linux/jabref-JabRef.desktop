@@ -7,5 +7,6 @@ Icon=APPLICATION_ICON
 Terminal=false
 Type=Application
 Categories=DEPLOY_BUNDLE_CATEGORY
+MimeType=text/x-bibtex;
 Keywords=bibtex;biblatex;latex;bibliography
 StartupWMClass=org-jabref-JabRefMain
